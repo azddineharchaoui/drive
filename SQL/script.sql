@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Utilisateurs (
     mot_de_passe VARCHAR(255) NOT NULL,
     id_role INT NOT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_role) REFERENCES roles(id_role)
+    FOREIGN KEY (id_role) REFERENCES roles(id_role) ON DELETE CASCADE 
 );
 
 CREATE TABLE IF NOT EXISTS Categories (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Vehicules (
     prix_journee DECIMAL(10, 2) NOT NULL,
     disponibilite ENUM('Disponible', 'Non disponible'),
     image_url MEDIUMBLOB,
-    FOREIGN KEY (id_categorie) REFERENCES Categories(id_categorie)
+    FOREIGN KEY (id_categorie) REFERENCES Categories(id_categorie) ON DELETE CASCADE 
 );
 
 CREATE TABLE IF NOT EXISTS Reservations (
@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS Reservations (
     lieu_retour VARCHAR(100),
     statut ENUM('en attente', 'confirmée', 'annulée') DEFAULT 'en attente',
     date_reservation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur),
-    FOREIGN KEY (id_vehicule) REFERENCES Vehicules(id_vehicule)
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE,
+    FOREIGN KEY (id_vehicule) REFERENCES Vehicules(id_vehicule) ON DELETE CASCADE
 );
 
 
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS Avis (
     commentaire TEXT,
     evaluation INT CHECK (evaluation BETWEEN 1 AND 5),
     actif BOOLEAN DEFAULT TRUE, 
-    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur),
-    FOREIGN KEY (id_vehicule) REFERENCES Vehicules(id_vehicule)
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE ,
+    FOREIGN KEY (id_vehicule) REFERENCES Vehicules(id_vehicule) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE VIEW ListeVehicules AS
@@ -104,3 +104,5 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
+
+SET GLOBAL max_allowed_packet=103741824;

@@ -87,5 +87,17 @@ class Vehicule {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+    public static function listeVehicules() {
+        $pdo = DatabaseConnection::getInstance()->getConnection();
+        if (!$pdo) {
+            echo "Erreur de connexion à la base de données.";
+            return [];
+        }
+        $query = "SELECT * FROM Vehicules";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 }
 ?>

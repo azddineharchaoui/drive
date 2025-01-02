@@ -6,13 +6,15 @@ class Avis {
     private $idVehicule;
     private $idClient;
     private $commentaire;
+    private $evaluation;
     private $dateCreation;
 
-    public function __construct($id = null, $idVehicule = null, $idClient = null, $commentaire = null, $dateCreation = null) {
+    public function __construct($id = null, $idVehicule = null, $idClient = null, $commentaire = null, $evaluation = null, $dateCreation = null) {
         $this->id = $id;
         $this->idVehicule = $idVehicule;
         $this->idClient = $idClient;
         $this->commentaire = $commentaire;
+        $this->evaluation = $evaluation;
         $this->dateCreation = $dateCreation;
     }
 
@@ -53,7 +55,7 @@ class Avis {
 
     public static function listerAvisParVehicule($idVehicule) {
         $pdo = DatabaseConnection::getInstance()->getConnection();
-        $query = "SELECT * FROM Avis WHERE id_vehicule = :idVehicule ORDER BY date_creation DESC";
+        $query = "SELECT * FROM Avis WHERE id_vehicule = :idVehicule";
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':idVehicule', $idVehicule, PDO::PARAM_INT);
         $stmt->execute();

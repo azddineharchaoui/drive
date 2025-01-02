@@ -7,7 +7,7 @@
         private $description;
         public function __construct($id, $nom, $description){
             $this->id = $id; 
-            $this-> = $nom; 
+            $this->nom = $nom; 
             $this->description = $description;
         }
         public function get_id(){

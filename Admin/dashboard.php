@@ -1,9 +1,10 @@
 <?php 
-// session_start();
+   session_start();
 // if (!isset($_SESSION['user_id']) || (isset($_SESSION['role_id']) && $_SESSION['role_id'] != 1)) {
 //     header("Location: ../index.php");
 //     exit;
 // }
+require_once('../Classes/Categorie.php');
 
 ?>
 <!DOCTYPE html>
@@ -104,49 +105,55 @@
                     </div>
                     <div class="card-body">
                         <form action="ajouterVehicule.php" method="post" enctype="multipart/form-data">
-                            <div class="mb-3">
-                                <label for="nomModele" class="form-label">Nom du Modèle :</label>
-                                <input type="text" class="form-control" name="nomModele" id="nomModele"
-                                    placeholder="Entrez le modèle du véhicule" required>
-                            </div>
+                            <div id="car-container">
+                                <input name="nbr_cars" id="nbr_cars" class="d-none">
+                                <div class="car-item">
+                                    <div class="mb-3">
+                                        <label for="nomModele0" class="form-label">Nom du Modèle :</label>
+                                        <input type="text" class="form-control" name="nomModele0" id="nomModele0"
+                                            placeholder="Entrez le modèle du véhicule" required>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label for="idCategorie" class="form-label">Catégorie :</label>
-                                <select class="form-select" name="idCategorie" id="idCategorie" required>
-                                    <option value="" disabled selected>Choisissez une catégorie</option>
-                                    <?php
-                                        require_once('Categorie.php');
-                                        $categories = Categorie::listerCategories();
-                                        foreach ($categories as $categorie) {
-                                            echo '<option value="' . htmlspecialchars($categorie['id_categorie']) . '">' . htmlspecialchars($categorie['nom_categorie']) . '</option>';
-                                        }
-                                    ?>
-                                </select>
-                            </div>
+                                    <div class="mb-3">
+                                        <label for="idCategorie0" class="form-label">Catégorie :</label>
+                                        <select class="form-select" name="idCategorie0" id="idCategorie0" required>
+                                            <option value="" disabled selected>Choisissez une catégorie</option>
+                                            <?php
+                                            $categories = Categorie::listerCategories();
+                                            foreach ($categories as $categorie) {
+                                                echo '<option value="' . htmlspecialchars($categorie['id_categorie']) . '">' . htmlspecialchars($categorie['nom_categorie']) . '</option>';
+                                            }
+                                        ?>
+                                        </select>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label for="prixJournee" class="form-label">Prix par Journée :</label>
-                                <input type="number" class="form-control" name="prixJournee" id="prixJournee"
-                                    step="0.01" placeholder="Entrez le prix par journée" required>
-                            </div>
+                                    <div class="mb-3">
+                                        <label for="prixJournee0" class="form-label">Prix par Journée :</label>
+                                        <input type="number" class="form-control" name="prixJournee0" id="prixJournee0"
+                                            step="0.01" placeholder="Entrez le prix par journée" required>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label for="disponibilite" class="form-label">Disponibilité :</label>
-                                <select class="form-select" name="disponibilite" id="disponibilite" required>
-                                    <option value="" disabled selected>Choisissez la disponibilité</option>
-                                    <option value="Disponible">Disponible</option>
-                                    <option value="Non disponible">Non disponible</option>
-                                </select>
-                            </div>
+                                    <div class="mb-3">
+                                        <label for="disponibilite0" class="form-label">Disponibilité :</label>
+                                        <select class="form-select" name="disponibilite0" id="disponibilite0" required>
+                                            <option value="" disabled selected>Choisissez la disponibilité</option>
+                                            <option value="Disponible">Disponible</option>
+                                            <option value="Non disponible">Non disponible</option>
+                                        </select>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label for="imageUrl" class="form-label">Image du Véhicule :</label>
-                                <input type="file" class="form-control" name="imageUrl" id="imageUrl" accept="image/*"
-                                    required>
-                            </div>
+                                    <div class="mb-3">
+                                        <label for="imageUrl0" class="form-label">Image du Véhicule :</label>
+                                        <input type="file" class="form-control" name="imageUrl0" id="imageUrl0"
+                                            accept="image/*" required>
+                                    </div>
+                                </div>
 
+
+                            </div>
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary w-50">Ajouter Véhicule</button>
+                                <button type="button" class="btn btn-secondary w-0" id="add_car">Ajouter plus</button>
+                                <button type="submit" class="btn btn-primary w-0">Ajouter </button>
                             </div>
                         </form>
                     </div>
@@ -158,42 +165,38 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nom</th>
-                            <th>Description</th>
-                            <th>Destination</th>
-                            <th>Prix</th>
-                            <th>Date de début</th>
-                            <th>Date de fin</th>
+                            <th>Nom du modèle</th>
+                            <th>id_categorie</th>
+                            <th>Prix de la journéé</th>
+                            <th>Disponibilité</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                require_once("../classes/activity.php");
+                require_once("../Classes/Vehicule.php");
 
-                $activity = new Activity(null, null, null, null, null, null);
-                $activites = $activity->allActivites();
-                if (count($activites) > 0): ?>
-                        <?php foreach ($activites as $act): ?>
+                $vehicules = Vehicule::listeVehicules();
+                if (count($vehicules) > 0): ?>
+                        <?php foreach ($vehicules as $vcl): ?>
                         <tr>
-                            <td><?= $act['id_activite']; ?></td>
-                            <td><?= $act['name']; ?></td>
-                            <td><?= $act['description']; ?></td>
-                            <td><?= $act['destination']; ?></td>
-                            <td><?= $act['price']; ?></td>
-                            <td><?= $act['start_date']; ?></td>
-                            <td><?= $act['end_date']; ?></td>
+                            <td><?= $vcl['id_vehicule']; ?></td>
+                            <td><?= $vcl['nom_modele']; ?></td>
+                            <td><?= $vcl['id_categorie']; ?></td>
+                            <td><?= $vcl['prix_journee']; ?></td>
+                            <td><?= $vcl['disponibilite']; ?></td>
                             <td>
-                                <button type="button" class="btn btn-success btn-sm editActivityBtn"
-                                    data-id="<?= $act['id_activite']; ?>" data-name="<?= $act['name']; ?>"
-                                    data-description="<?= $act['description']; ?>"
-                                    data-destination="<?= $act['destination']; ?>" data-price="<?= $act['price']; ?>"
-                                    data-start-date="<?= $act['start_date']; ?>"
-                                    data-end-date="<?= $act['end_date']; ?>">
+                                <button type="button" class="btn btn-success btn-sm editVoitureBtn"
+                                    data-id="<?= $vcl['id_vehicule']; ?>"
+                                    data-nom-modele="<?= htmlspecialchars($vcl['nom_modele'], ENT_QUOTES); ?>"
+                                    data-id-categorie="<?= $vcl['id_categorie']; ?>"
+                                    data-prix-journee="<?= $vcl['prix_journee']; ?>"
+                                    data-disponibilite="<?= $vcl['disponibilite']; ?>">
                                     Modifier
                                 </button>
-                                <form method="POST" action="manage_activities.php" class="d-inline">
-                                    <button type="submit" name="delete_activity" value="<?= $act['id_activite']; ?>"
+
+                                <form method="POST" action="manage_vehicule.php" class="d-inline">
+                                    <button type="submit" name="delete_vehicule" value="<?= $vcl['id_vehicule']; ?>"
                                         class="btn btn-danger btn-sm">Supprimer</button>
                                 </form>
                             </td>
@@ -208,56 +211,135 @@
                 </table>
         </div>
     </div>
-    <!-- Modal Modifier Activité -->
-    <div class="modal fade" id="editActivityModal" tabindex="-1" aria-labelledby="editActivityModalLabel"
+    <!-- Modal Modifier Vehicule -->
+    <!-- Modal pour la modification d'un véhicule -->
+    <div class="modal fade" id="editVehiculeModal" tabindex="-1" aria-labelledby="editVehiculeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="manage_activities.php">
+                <form id="editVehiculeForm" method="POST" action="manage_vehicule.php" enctype="multipart/form-data">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editActivityModalLabel">Modifier une Activité</h5>
+                        <h5 class="modal-title" id="editVehiculeModalLabel">Modifier le Véhicule</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" id="edit_activity_id" name="id_act">
+                        <input type="hidden" name="edit_vehicule" value="1">
+                        <input type="hidden" id="edit_id_vehicule" name="id_vehicule">
+
                         <div class="mb-3">
-                            <label for="edit_activity_name" class="form-label">Nom d'activité</label>
-                            <input type="text" class="form-control" id="edit_activity_name" name="menu_name" required>
+                            <label for="edit_nom_modele" class="form-label">Nom du Modèle :</label>
+                            <input type="text" class="form-control" id="edit_nom_modele" name="nom_modele" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="edit_activity_description" class="form-label">Description</label>
-                            <textarea class="form-control" id="edit_activity_description" name="activite_description"
-                                rows="4" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_activity_destination" class="form-label">Destination</label>
-                            <input type="text" class="form-control" id="edit_activity_destination"
-                                name="activite_destination" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_activity_price" class="form-label">Prix</label>
-                            <input type="text" class="form-control" id="edit_activity_price" name="activite_price"
+                            <label for="edit_id_categorie" class="form-label">Catégorie :</label>
+                            <input type="number" class="form-control" id="edit_id_categorie" name="id_categorie"
                                 required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="edit_activity_start_date" class="form-label">Date de début</label>
-                            <input type="date" class="form-control" id="edit_activity_start_date" name="start_date"
-                                required>
+                            <label for="edit_prix_journee" class="form-label">Prix par Journée :</label>
+                            <input type="text" class="form-control" id="edit_prix_journee" name="prix_journee" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="edit_activity_end_date" class="form-label">Date de fin</label>
-                            <input type="date" class="form-control" id="edit_activity_end_date" name="end_date"
-                                required>
+                            <label for="edit_disponibilite" class="form-label">Disponibilité :</label>
+                            <select class="form-select" id="edit_disponibilite" name="disponibilite" required>
+                                <option value="1">Disponible</option>
+                                <option value="0">Non Disponible</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_image_url" class="form-label">Image (optionnel) :</label>
+                            <input type="file" class="form-control" id="edit_image_url" name="image_url"
+                                accept="image/*">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="submit" name="edit_activity" class="btn btn-primary">Enregistrer</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Section des avis -->
+    <div class="container mt-5">
+    <h2>Gestion des Avis</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ID Véhicule</th>
+                <th>ID Utilisateur</th>
+                <th>Commentaire</th>
+                <th>Évaluation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            require_once('../Classes/Avis.php');
+            $avisList = Avis::listerAvisParVehicule($_GET['vehicule_id'] ?? null); // Passer un ID si nécessaire
+            foreach ($avisList as $avis) {
+                echo "<tr>";
+                echo "<td>{$avis['id_avis']}</td>";
+                echo "<td>{$avis['id_vehicule']}</td>";
+                echo "<td>{$avis['id_utilisateur']}</td>";
+                echo "<td>{$avis['commentaire']}</td>";
+                echo "<td>{$avis['evaluation']}</td>";
+                echo "<td>
+                        <button class='btn btn-primary btn-sm editAvisBtn' data-id='{$avis['id_avis']}' data-commentaire='{$avis['commentaire']}' data-evaluation='{$avis['evaluation']}'>Modifier</button>
+                        <form method='POST' action='' style='display:inline-block;'>
+                            <input type='hidden' name='delete_avis' value='{$avis['id_avis']}'>
+                            <button type='submit' class='btn btn-danger btn-sm'>Supprimer</button>
+                        </form>
+                      </td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+
+    <div class="modal fade" id="editAvisModal" tabindex="-1" aria-labelledby="editAvisModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editAvisForm" action="manage_avis.php" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editAvisModalLabel">Modifier l'Avis</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="edit_avis" value="1">
+                        <input type="hidden" id="edit_id_avis" name="id_avis">
+                        <div class="mb-3">
+                            <label for="edit_commentaire" class="form-label">Commentaire</label>
+                            <textarea class="form-control" id="edit_commentaire" name="commentaire" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_evaluation" class="form-label">Évaluation</label>
+                            <select class="form-select" id="edit_evaluation" name="evaluation" required>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     </main>
     </div>
@@ -268,7 +350,104 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+    document.getElementById('add_car').addEventListener('click', (event) => {
+        event.preventDefault(); // Empêche le comportement par défaut (envoi du formulaire)
 
+        const carContainer = document.getElementById('car-container');
+        let carCount = carContainer.children.length;
+
+        const newCar = `<div class="car-item">
+                        <div class="mb-3">
+                            <label for="nomModele${carCount}" class="form-label">Nom du Modèle :</label>
+                            <input type="text" class="form-control" name="nomModele${carCount}" id="nomModele${carCount}"
+                                placeholder="Entrez le modèle du véhicule" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="idCategorie${carCount}" class="form-label">Catégorie :</label>
+                            <select class="form-select" name="idCategorie${carCount}" id="idCategorie${carCount}" required>
+                                <option value="" disabled selected>Choisissez une catégorie</option>
+                                <?php
+                                    require_once('../Classes/Categorie.php');
+                                    $categories = Categorie::listerCategories();
+                                    foreach ($categories as $categorie) {
+                                        echo '<option value="' . htmlspecialchars($categorie['id_categorie']) . '">' . htmlspecialchars($categorie['nom_categorie']) . '</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="prixJournee${carCount}" class="form-label">Prix par Journée :</label>
+                            <input type="number" class="form-control" name="prixJournee${carCount}" id="prixJournee${carCount}"
+                                step="0.01" placeholder="Entrez le prix par journée" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="disponibilite${carCount}" class="form-label">Disponibilité :</label>
+                            <select class="form-select" name="disponibilite${carCount}" id="disponibilite${carCount}" required>
+                                <option value="" disabled selected>Choisissez la disponibilité</option>
+                                <option value="Disponible">Disponible</option>
+                                <option value="Non disponible">Non disponible</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageUrl${carCount}" class="form-label">Image du Véhicule :</label>
+                            <input type="file" class="form-control" name="imageUrl${carCount}" id="imageUrl${carCount}"
+                                accept="image/*" required>
+                        </div>
+                    </div>`;
+
+        carContainer.insertAdjacentHTML('beforeend', newCar);
+        carCount++;
+        document.getElementById('nbr_cars').value = carCount;
+
+
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const editButtons = document.querySelectorAll('.editVoitureBtn');
+        const modal = new bootstrap.Modal(document.getElementById('editVehiculeModal'));
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+
+                const id = button.getAttribute('data-id');
+                const nomModele = button.getAttribute('data-nom-modele');
+                const idCategorie = button.getAttribute('data-id-categorie');
+                const prixJournee = button.getAttribute('data-prix-journee');
+                const disponibilite = button.getAttribute('data-disponibilite');
+
+                document.getElementById('edit_id_vehicule').value = id;
+                document.getElementById('edit_nom_modele').value = nomModele;
+                document.getElementById('edit_id_categorie').value = idCategorie;
+                document.getElementById('edit_prix_journee').value = prixJournee;
+                document.getElementById('edit_disponibilite').value = disponibilite;
+
+                modal.show();
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const editButtons = document.querySelectorAll('.editAvisBtn');
+        const modal = new bootstrap.Modal(document.getElementById('editAvisModal'));
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                const commentaire = button.getAttribute('data-commentaire');
+                const evaluation = button.getAttribute('data-evaluation');
+
+                document.getElementById('edit_id_avis').value = id;
+                document.getElementById('edit_commentaire').value = commentaire;
+                document.getElementById('edit_evaluation').value = evaluation;
+
+                modal.show();
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>
