@@ -22,9 +22,40 @@ class Reservation {
         $this->statut = $statut;
     }
 
-    public function ajouterReservation() {
+    public function verifierDisponibilite($idVehicule, $dateDebut, $dateFin) {
         $pdo = DatabaseConnection::getInstance()->getConnection();
-        $query = "CALL AjouterReservation(:idUtilisateur, :idVehicule, :dateDebut, :dateFin, :lieuDepart, :lieuRetour)";
+        $query = "SELECT disponibilite FROM Vehicules 
+                  WHERE id_vehicule = :idVehicule 
+                  AND disponibilite = 'disponible'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM Reservations 
+                      WHERE id_vehicule = :idVehicule 
+                      AND statut != 'annulée'
+                      AND (
+                          (date_debut BETWEEN :dateDebut AND :dateFin)
+                          OR (date_fin BETWEEN :dateDebut AND :dateFin)
+                          OR (:dateDebut BETWEEN date_debut AND date_fin)
+                      )
+                  )";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':idVehicule', $idVehicule, PDO::PARAM_INT);
+        $stmt->bindParam(':dateDebut', $dateDebut);
+        $stmt->bindParam(':dateFin', $dateFin);
+        $stmt->execute();
+        
+        return $stmt->rowCount() > 0;
+    }
+    
+    public function ajouterReservation() {
+        if (!$this->verifierDisponibilite($this->idVehicule, $this->dateDebut, $this->dateFin)) {
+            return false;
+        }
+        
+        $pdo = DatabaseConnection::getInstance()->getConnection();
+        $query = "INSERT INTO Reservations (id_utilisateur, id_vehicule, date_debut, date_fin, lieu_depart, lieu_retour, statut) 
+                  VALUES (:idUtilisateur, :idVehicule, :dateDebut, :dateFin, :lieuDepart, :lieuRetour, 'en attente')";
+                  
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':idUtilisateur', $this->idUtilisateur, PDO::PARAM_INT);
         $stmt->bindParam(':idVehicule', $this->idVehicule, PDO::PARAM_INT);
@@ -32,6 +63,7 @@ class Reservation {
         $stmt->bindParam(':dateFin', $this->dateFin);
         $stmt->bindParam(':lieuDepart', $this->lieuDepart);
         $stmt->bindParam(':lieuRetour', $this->lieuRetour);
+        
         return $stmt->execute();
     }
 
