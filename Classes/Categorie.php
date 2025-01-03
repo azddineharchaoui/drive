@@ -5,7 +5,7 @@
         private $id; 
         private $nom; 
         private $description;
-        public function __construct($id, $nom, $description){
+        public function __construct($id = null, $nom = null, $description = null){
             $this->id = $id; 
             $this->nom = $nom; 
             $this->description = $description;
@@ -40,7 +40,7 @@
             $stmt->bindParam(':nom', $this->nom);
             $stmt->bindParam(':description', $this->description);
             if ($stmt->execute()) {
-                $this->id = $db->lastInsertId(); 
+                $this->id = $pdo->lastInsertId(); 
                 return true;
             } else {
                 return false;
@@ -79,7 +79,7 @@
                 echo "Erreur de connexion à la base de données.";
                 return [];
             }
-            $query = "SELECT id_categorie, nom_categorie FROM Categories";
+            $query = "SELECT id_categorie, nom_categorie, description FROM Categories";
             $stmt = $pdo->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

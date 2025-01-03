@@ -3,7 +3,7 @@ require_once('../Classes/Vehicule.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $nbr_cars = htmlentities($_POST['nbr_cars']);
+        $nbr_cars = intval($_POST['nbr_cars']) > 0? htmlentities($_POST['nbr_cars']) : 1;
         for($i=0; $i<$nbr_cars; $i++) {
             $nomModele = $_POST["nomModele$i"];
             $idCategorie = $_POST["idCategorie$i"];

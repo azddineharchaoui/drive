@@ -2,12 +2,12 @@
     require_once('db.php');
 
     abstract class Utilisateur {
-        private $id; 
-        private $nom; 
-        private $prenom;
-        private $email;
-        private $password;
-        private $id_role;
+        protected $id; 
+        protected $nom; 
+        protected $prenom;
+        protected $email;
+        protected $password;
+        protected $id_role;
 
         public function __construct($id, $nom, $prenom, $email, $password, $id_role){
             $this->id = $id; 
@@ -80,17 +80,17 @@
                     $_SESSION['user_name'] = $user['nom'];
         
                     if ($_SESSION['role_id'] == 1) {
-                        header("Location: ../Admin/dashboard.php");
+                        header("Location: ./Admin/dashboard.php");
                     } else {
-                        header("Location: ../location.php");
+                        header("Location: ./location.php");
                     }
                 } else {
                     echo "<script>alert('Mot de passe incorrect. Veuillez réessayer.');</script>";
-                    header("Refresh: 0; URL=login.php");
+                    header("Refresh: 0; URL=index.php");
                 }
             } else {
                 echo "<script>alert('Adresse e-mail introuvable. Veuillez vérifier vos informations.');</script>";
-                header("Refresh: 0; URL=login.php");
+                header("Refresh: 0; URL=index.php");
             }
         }
         

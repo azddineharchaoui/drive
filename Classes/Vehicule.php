@@ -35,7 +35,7 @@ class Vehicule {
         $stmt->bindParam(':idCategorie', $this->idCategorie, PDO::PARAM_INT);
         $stmt->bindParam(':prixJournee', $this->prixJournee);
         $stmt->bindParam(':disponibilite', $this->disponibilite);
-        $stmt->bindParam(':imageUrl', $this->imageUrl, PDO::PARAM_LOB); // PARAM_LOB pour BLOB
+        $stmt->bindParam(':imageUrl', $this->imageUrl, PDO::PARAM_LOB); 
         return $stmt->execute();
     }
 
@@ -93,7 +93,7 @@ class Vehicule {
             echo "Erreur de connexion à la base de données.";
             return [];
         }
-        $query = "SELECT * FROM Vehicules";
+        $query = "SELECT * FROM Vehicules as v inner join Categories as c on v.id_categorie = c.id_categorie";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

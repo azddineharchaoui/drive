@@ -41,7 +41,13 @@ require_once('../Classes/Categorie.php');
                         <a class="nav-link" href="#reservations">Reservations</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#activites">Activités</a>
+                        <a class="nav-link" href="#voitures">Voitures</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#avis">Avis</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#categorie">Categories</a>
                     </li>
 
                 </ul>
@@ -245,8 +251,8 @@ require_once('../Classes/Categorie.php');
                         <div class="mb-3">
                             <label for="edit_disponibilite" class="form-label">Disponibilité :</label>
                             <select class="form-select" id="edit_disponibilite" name="disponibilite" required>
-                                <option value="1">Disponible</option>
-                                <option value="0">Non Disponible</option>
+                                <option value="Disponible">Disponible</option>
+                                <option value="Non disponible">Non disponible</option>
                             </select>
                         </div>
 
@@ -266,21 +272,21 @@ require_once('../Classes/Categorie.php');
     </div>
 
     <!-- Section des avis -->
-    <div class="container mt-5">
-    <h2>Gestion des Avis</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>ID Véhicule</th>
-                <th>ID Utilisateur</th>
-                <th>Commentaire</th>
-                <th>Évaluation</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
+    <div class="container mt-5" id="avis">
+        <h2>Gestion des Avis</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ID Véhicule</th>
+                    <th>ID Utilisateur</th>
+                    <th>Commentaire</th>
+                    <th>Évaluation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
             require_once('../Classes/Avis.php');
             $avisList = Avis::listerAvisParVehicule($_GET['vehicule_id'] ?? null); // Passer un ID si nécessaire
             foreach ($avisList as $avis) {
@@ -300,9 +306,9 @@ require_once('../Classes/Categorie.php');
                 echo "</tr>";
             }
             ?>
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 
 
     <div class="modal fade" id="editAvisModal" tabindex="-1" aria-labelledby="editAvisModalLabel" aria-hidden="true">
@@ -334,6 +340,106 @@ require_once('../Classes/Categorie.php');
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section de categorie -->
+
+    <div class="container mt-5" id="categorie">
+        <h2>Gestion des Catégories</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nom de la Catégorie</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+            require_once('../Classes/Categorie.php');
+
+            $categories = Categorie::listerCategories();
+            if (count($categories) > 0):
+                foreach ($categories as $categorie):
+            ?>
+                <tr>
+                    <td><?= $categorie['id_categorie']; ?></td>
+                    <td><?= htmlspecialchars($categorie['nom_categorie'], ENT_QUOTES); ?></td>
+                    <td><?= htmlspecialchars($categorie['description'] ?? 'Non spécifiée', ENT_QUOTES); ?></td>
+                    <td>
+
+                        <button type="button" class="btn btn-success btn-sm editCategorieBtn"
+                            data-id="<?= $categorie['id_categorie']; ?>"
+                            data-nom="<?= htmlspecialchars($categorie['nom_categorie'], ENT_QUOTES); ?>"
+                            data-description="<?= htmlspecialchars($categorie['description'] ?? '', ENT_QUOTES); ?>">
+                            Modifier
+                        </button>
+
+                        <!-- Formulaire Supprimer -->
+                        <form method="POST" action="manage_categorie.php" class="d-inline">
+                            <input type="hidden" name="delete_categorie" value="<?= $categorie['id_categorie']; ?>">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php
+                endforeach;
+            else:
+            ?>
+                <tr>
+                    <td colspan="4" class="text-center">Aucune catégorie trouvée.</td>
+                </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <!-- Formulaire Ajouter une Catégorie -->
+        <h3>Ajouter une Nouvelle Catégorie</h3>
+        <form method="POST" action="manage_categorie.php">
+            <div class="mb-3">
+                <label for="nomCategorie" class="form-label">Nom de la Catégorie</label>
+                <input type="text" name="nom_categorie" id="nomCategorie" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="descriptionCategorie" class="form-label">Description</label>
+                <textarea name="description_categorie" id="descriptionCategorie" class="form-control"
+                    rows="3"></textarea>
+            </div>
+            <button type="submit" name="add_categorie" class="btn btn-primary">Ajouter</button>
+        </form>
+    </div>
+
+    <!-- Modale de modification categorie -->
+
+    <div class="modal fade" id="editCategorieModal" tabindex="-1" aria-labelledby="editCategorieModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="manage_categorie.php">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategorieModalLabel">Modifier la Catégorie</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_categorie" id="editCategorieId">
+                        <div class="mb-3">
+                            <label for="editNomCategorie" class="form-label">Nom de la Catégorie</label>
+                            <input type="text" name="nom_categorie" id="editNomCategorie" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescriptionCategorie" class="form-label">Description</label>
+                            <textarea name="description_categorie" id="editDescriptionCategorie" class="form-control"
+                                rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" name="edit_categorie" class="btn btn-primary">Enregistrer</button>
                     </div>
                 </form>
             </div>
@@ -445,6 +551,20 @@ require_once('../Classes/Categorie.php');
 
                 modal.show();
             });
+        });
+    });
+    document.querySelectorAll('.editCategorieBtn').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            const nom = button.getAttribute('data-nom');
+            const description = button.getAttribute('data-description');
+
+            document.getElementById('editCategorieId').value = id;
+            document.getElementById('editNomCategorie').value = nom;
+            document.getElementById('editDescriptionCategorie').value = description;
+
+            const editModal = new bootstrap.Modal(document.getElementById('editCategorieModal'));
+            editModal.show();
         });
     });
     </script>
