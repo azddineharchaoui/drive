@@ -1,9 +1,9 @@
 <?php 
    session_start();
-// if (!isset($_SESSION['user_id']) || (isset($_SESSION['role_id']) && $_SESSION['role_id'] != 1)) {
-//     header("Location: ../index.php");
-//     exit;
-// }
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['role_id'] != 1)) {
+    header("Location: ../index.php");
+    exit;
+}
 require_once('../Classes/Categorie.php');
 
 ?>
