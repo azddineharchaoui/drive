@@ -6,6 +6,46 @@ if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_id']) && $_SESSION['r
 }
 require_once('../Classes/Categorie.php');
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once('../Classes/Reservation.php');
+    
+    if (isset($_POST['action']) && isset($_POST['reservation_id'])) {
+        $reservationId = $_POST['reservation_id'];
+        $reservation = new Reservation();
+        
+        if ($_POST['action'] === 'accept') {
+            if ($reservation->confirmerReservation($reservationId)) {
+                $_SESSION['message'] = "Réservation acceptée avec succès.";
+                $_SESSION['message_type'] = "success";
+            } else {
+                $_SESSION['message'] = "Erreur lors de l'acceptation de la réservation.";
+                $_SESSION['message_type'] = "danger";
+            }
+        } elseif ($_POST['action'] === 'reject') {
+            if ($reservation->annulerReservation($reservationId)) {
+                $_SESSION['message'] = "Réservation refusée avec succès.";
+                $_SESSION['message_type'] = "success";
+            } else {
+                $_SESSION['message'] = "Erreur lors du refus de la réservation.";
+                $_SESSION['message_type'] = "danger";
+            }
+        }
+        
+        header('Location: ' . $_SERVER['PHP_SELF'] . '#reservations');
+        exit();
+    }
+}
+
+if (isset($_SESSION['message'])): ?>
+<div class="alert alert-<?= $_SESSION['message_type'] ?> alert-dismissible fade show" role="alert">
+    <?= $_SESSION['message'] ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<?php 
+    unset($_SESSION['message']);
+    unset($_SESSION['message_type']);
+endif;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -93,8 +133,24 @@ require_once('../Classes/Categorie.php');
                                     </p>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
-                                    <button class="btn btn-success w-45">Accepter</button>
-                                    <button class="btn btn-danger w-45">Refuser</button>
+                                    <form method="POST" class="d-inline w-45">
+                                        <input type="hidden" name="reservation_id"
+                                            value="<?= $reservation['id_reservation'] ?>">
+                                        <input type="hidden" name="action" value="accept">
+                                        <button type="submit" class="btn btn-success w-100"
+                                            <?= $reservation['statut'] !== 'en attente' ? 'disabled' : '' ?>>
+                                            Accepter
+                                        </button>
+                                    </form>
+                                    <form method="POST" class="d-inline w-45">
+                                        <input type="hidden" name="reservation_id"
+                                            value="<?= $reservation['id_reservation'] ?>">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-danger w-100"
+                                            <?= $reservation['statut'] !== 'en attente' ? 'disabled' : '' ?>>
+                                            Refuser
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

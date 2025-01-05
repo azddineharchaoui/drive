@@ -34,7 +34,7 @@
             </button>
             <ul id="navLinks" class="hidden md:flex space-x-6 text-gray-700">
                 <li><a href="#home" class="hover:text-blue-500">Accueil</a></li>
-                <li><a href="location.php" class="hover:text-blue-500">Voitures</a></li>
+                <li><a href="./location.php" class="hover:text-blue-500">Voitures</a></li>
                 <li><a href="#about" class="hover:text-blue-500">À propos</a></li>
                 <li><a href="#notre-public-cible" class="hover:text-blue-500">Notre Public</a></li>
             </ul>
@@ -63,7 +63,7 @@
         <div id="mobileMenu" class="hidden bg-white shadow-md">
             <ul class="flex flex-col space-y-2 py-4 px-6 text-gray-700">
                 <li><a href="index.php" class="hover:text-blue-500">Accueil</a></li>
-                <li><a href="location.php" class="hover:text-blue-500">Voitures</a></li>
+                <li><a href="./drive/location.php" class="hover:text-blue-500">Voitures</a></li>
                 <li><a href="#about" class="hover:text-blue-500">À propos</a></li>
                 <li><a href="#notre-public-cible" class="hover:text-blue-500">Notre Public</a></li>
             </ul>
